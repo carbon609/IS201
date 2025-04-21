@@ -1,0 +1,44 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #dbedff;
+    color: #280000;
+    margin: 0;
+    padding: 0;
+}
+  
+li {
+  text-align: left;
+}
+
+.header {
+    background-image: url('https://media.istockphoto.com/id/639882260/photo/voleyball-net-isolated.jpg?s=612x612&w=0&k=20&c=3bCV0mYx0FZ23Mjx4GvJJj2mlRnTORSRuN1wnFZ2fJw=');
+    background-size: cover;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+  
+.nav {
+    text-align: right;
+    padding: 10px 20px;
+    background-color: #0077cc;
+}
+  
+.nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+  
+.content {
+    padding: 20px;
+}
+  
+  
+.footer {
+    text-align: center;
+    background-color: #eee;
+    padding: 20px;
+    margin-top: 40px;
+}
