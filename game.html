@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack-a-Mole Lite</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      overflow: hidden;
+    }
+    h1 {
+      margin-top: 30px;
+    }
+    #gameArea {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      margin: 30px auto;
+      background-color: #cceeff;
+      border: 3px solid #0077aa;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .mole {
+      width: 50px;
+      height: 50px;
+      background-color: brown;
+      border-radius: 50%;
+      position: absolute;
+      cursor: pointer;
+    }
+    #score, #timer {
+      font-size: 1.5em;
+      margin: 10px;
+    }
+    #startBtn {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #0077aa;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #startBtn:hover {
+      background-color: #005577;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Whack-a-Mole</h1>
+<a href="index.html">return to professional page</a>
+<div id="score">Score: 0</div>
+<div id="timer">Time: 30</div>
+<button id="startBtn">Start Game</button>
+<div id="gameArea"></div>
+
+<!-- Canvas for confetti -->
+<canvas id="confettiCanvas" style="position: fixed; top: 0; left: 0; pointer-events: none;"></canvas>
+
+<script>
+  const gameArea = document.getElementById('gameArea');
+  const scoreDisplay = document.getElementById('score');
+  const timerDisplay = document.getElementById('timer');
+  const startBtn = document.getElementById('startBtn');
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const confettiCtx = confettiCanvas.getContext('2d');
+
+  let score = 0;
+  let timeLeft = 30;
+  let mole;
+  let gameInterval;
+  let moleInterval;
+  let confettiPieces = [];
+
+  function getRandomPosition() {
+    const x = Math.floor(Math.random() * (gameArea.clientWidth - 50));
+    const y = Math.floor(Math.random() * (gameArea.clientHeight - 50));
+    return { x, y };
+  }
+
+  function createMole() {
+    if (mole) mole.remove();
+
+    mole = document.createElement('div');
+    mole.classList.add('mole');
+    const pos = getRandomPosition();
+    mole.style.left = `${pos.x}px`;
+    mole.style.top = `${pos.y}px`;
+
+    mole.onclick = () => {
+      score++;
+      scoreDisplay.textContent = `Score: ${score}`;
+      mole.remove();
+    };
+
+    gameArea.appendChild(mole);
+  }
+
+  function startGame() {
+    score = 0;
+    timeLeft = 30;
+    scoreDisplay.textContent = 'Score: 0';
+    timerDisplay.textContent = 'Time: 30';
+
+    startBtn.disabled = true;
+
+    createMole();
+    moleInterval = setInterval(createMole, 800);
+
+    gameInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = `Time: ${timeLeft}`;
+      if (timeLeft <= 0) {
+        clearInterval(gameInterval);
+        clearInterval(moleInterval);
+        if (mole) mole.remove();
+        alert(`Time's up! Your score: ${score}`);
+        startBtn.disabled = false;
+        if (score > 25) {
+          startConfetti();
+        }
+      }
+    }, 1000);
+  }
+
+  startBtn.addEventListener('click', startGame);
+
+  // -------- CONFETTI LOGIC --------
+  function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startConfetti() {
+    confettiPieces = Array.from({ length: 150 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * -window.innerHeight,
+      size: Math.random() * 8 + 4,
+      speed: Math.random() * 3 + 2,
+      color: Math.random() > 0.5 ? '#0077ff' : '#ffffff',
+      tilt: Math.random() * 10 - 5
+    }));
+    requestAnimationFrame(updateConfetti);
+  }
+
+  function updateConfetti() {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+    confettiPieces.forEach(p => {
+      p.y += p.speed;
+      p.x += Math.sin(p.y * 0.01);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.beginPath();
+      confettiCtx.ellipse(p.x, p.y, p.size, p.size / 2, p.tilt, 0, 2 * Math.PI);
+      confettiCtx.fill();
+    });
+
+    confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight);
+    if (confettiPieces.length > 0) {
+      requestAnimationFrame(updateConfetti);
+    }
+  }
+</script>
+
+</body>
+</html>
